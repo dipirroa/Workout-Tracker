@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Workout Tracker">
-<title>Workout Tracker</title>
+<title>GRIND — Workout Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -18,7 +18,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow: hidden; }
   #app { height: 100%; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
-  .screen { flex: 1; overflow-y: auto; padding: 16px 16px 90px; display: none; }
+  .screen { flex: 1; overflow-y: auto; padding: calc(env(safe-area-inset-top) + 16px) 16px 90px; display: none; }
   .screen.active { display: block; }
 
   /* NAV */
@@ -193,7 +193,7 @@
   <!-- HOME -->
   <div id="homeScreen" class="screen active">
     <div class="home-date" id="homeDate"></div>
-    <div class="home-greeting">Let's<br><span>Get To It.</span></div>
+    <div class="home-greeting">LET'S<br><span>GET TO IT.</span></div>
     <button class="start-btn" onclick="startBlankWorkout()">
       QUICK WORKOUT
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1035,11 +1035,22 @@ function renderDayExRow(dayId, dex) {
 
 function updateDayName(dayId,v){const d=editingRoutine.days.find(d=>d.id===dayId);if(d)d.name=v;}
 function removeDayFromBuilder(dayId){editingRoutine.days=editingRoutine.days.filter(d=>d.id!==dayId);document.getElementById(`day-builder-${dayId}`)?.remove();}
-function openDayExercisePicker(dayId){editingDayTarget=dayId;document.getElementById('dayExerciseSearch').value='';renderPickerList('dayExercisePickerList','',addExerciseToDay);openModal('dayExercisePickerModal');}
-function addExerciseToDay(exerciseId){
-  const day=editingRoutine.days.find(d=>d.id===editingDayTarget);if(!day)return;
-  const dex={id:uid(),exerciseId,sets:3};
-  day.exercises.push(dex);closeModal('dayExercisePickerModal');renderDayExRow(editingDayTarget,dex);
+function openDayExercisePicker(dayId) {
+  editingDayTarget = dayId;
+  document.getElementById('dayExerciseSearch').value = '';
+  renderPickerList('dayExercisePickerList', '', addExerciseToDay);
+  // Open on top of the routine modal
+  document.getElementById('dayExercisePickerModal').style.zIndex = '200';
+  openModal('dayExercisePickerModal');
+}
+function addExerciseToDay(exerciseId) {
+  const targetDayId = editingDayTarget; // capture before any re-render clears it
+  const day = editingRoutine.days.find(d=>d.id===targetDayId);
+  if (!day) return;
+  const dex = {id:uid(), exerciseId, sets:3};
+  day.exercises.push(dex);
+  closeModal('dayExercisePickerModal');
+  renderDayExRow(targetDayId, dex);
 }
 function updateDayExSets(dayId,dexId,v){const d=editingRoutine.days.find(d=>d.id===dayId);if(d){const dex=d.exercises.find(e=>e.id===dexId);if(dex)dex.sets=parseInt(v)||3;}}
 function removeDayEx(dayId,dexId){const d=editingRoutine.days.find(d=>d.id===dayId);if(d){d.exercises=d.exercises.filter(e=>e.id!==dexId);document.getElementById(`dex-row-${dexId}`)?.remove();}}
