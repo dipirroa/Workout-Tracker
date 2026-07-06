@@ -272,21 +272,21 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-fam
   <div id="routinesList"></div>
 </div>
 
-<!-- ACTIVITY (Log / Exercise / Volume / Body) -->
+<!-- HISTORY -->
+<div id="historyScreen" class="screen">
+  <div class="page-header"><div class="page-title">HISTORY</div></div>
+  <div id="historyList"></div>
+</div>
+
+<!-- PROGRESS -->
 <div id="progressScreen" class="screen">
-  <div class="page-header"><div class="page-title">ACTIVITY</div></div>
-  <div class="toggle-group" style="margin-bottom:16px">
-    <button type="button" id="progTab-history" class="btn btn-primary btn-sm" onclick="setProgressTab('history')">Log</button>
-    <button type="button" id="progTab-exercise" class="btn btn-ghost btn-sm" onclick="setProgressTab('exercise')">Exercise</button>
-    <button type="button" id="progTab-volume" class="btn btn-ghost btn-sm" onclick="setProgressTab('volume')">Volume</button>
-    <button type="button" id="progTab-body" class="btn btn-ghost btn-sm" onclick="setProgressTab('body')">Body</button>
+  <div class="page-header"><div class="page-title">PROGRESS</div></div>
+  <div style="display:flex;gap:8px;margin-bottom:18px">
+    <button id="ptab-lifts" class="btn btn-primary btn-sm" style="flex:1" onclick="switchProgressTab('lifts')">Lifts</button>
+    <button id="ptab-body" class="btn btn-ghost btn-sm" style="flex:1" onclick="switchProgressTab('body')">Body</button>
   </div>
 
-  <div id="progressHistoryTab">
-    <div id="historyList"></div>
-  </div>
-
-  <div id="progressExerciseTab" style="display:none">
+  <div id="progressLifts">
     <div class="field">
       <label>Exercise</label>
       <select id="chartExSelect" class="chart-select" onchange="renderCharts()"></select>
@@ -294,29 +294,33 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-fam
     <div id="chartArea"></div>
   </div>
 
-  <div id="progressVolumeTab" style="display:none">
-    <div class="toggle-group" style="margin-bottom:14px">
-      <button type="button" id="volPeriod-4" class="btn btn-ghost btn-sm" onclick="setVolumePeriod(4)">4W</button>
-      <button type="button" id="volPeriod-8" class="btn btn-primary btn-sm" onclick="setVolumePeriod(8)">8W</button>
-      <button type="button" id="volPeriod-12" class="btn btn-ghost btn-sm" onclick="setVolumePeriod(12)">12W</button>
+  <div id="progressBody" style="display:none">
+    <div class="page-header" style="margin-bottom:14px">
+      <div class="section-title" style="margin-bottom:0">Goal Progress</div>
+      <button class="btn btn-primary btn-sm" onclick="openBodyMetricModal()">+ Log</button>
     </div>
-    <div id="volumeChartArea"></div>
-  </div>
-
-  <div id="progressBodyTab" style="display:none">
-    <button class="btn btn-primary btn-full" style="margin-bottom:14px" onclick="openLogBodyModal()">+ Log Body Metrics</button>
+    <div id="goalSummary"></div>
+    <div class="field" style="margin-top:16px">
+      <label>Metric</label>
+      <select id="bodyMetricSelect" class="chart-select" onchange="renderBodyChart()">
+        <option value="weight">Weight</option>
+        <option value="bodyFat">Body Fat %</option>
+        <option value="leanMass">Lean Mass</option>
+        <option value="waist">Waist</option>
+        <option value="chest">Chest</option>
+        <option value="arms">Arms</option>
+      </select>
+    </div>
     <div id="bodyChartArea"></div>
+    <div class="section-title" style="margin-top:20px">Log</div>
     <div id="bodyMetricsList"></div>
   </div>
 </div>
 
-<!-- EXERCISES (reached via Settings > Manage Exercises) -->
+<!-- EXERCISES -->
 <div id="exercisesScreen" class="screen">
   <div class="page-header">
-    <div style="display:flex;align-items:center;gap:10px">
-      <button class="btn btn-ghost btn-sm" onclick="showScreen('settings')" style="padding:6px 10px">←</button>
-      <div class="page-title" style="font-size:32px">EXERCISES</div>
-    </div>
+    <div class="page-title">EXERCISES</div>
     <button class="btn btn-primary btn-sm" onclick="openNewExerciseModal()">+ New</button>
   </div>
   <div id="exerciseLibraryList"></div>
@@ -325,13 +329,6 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-fam
 <!-- SETTINGS -->
 <div id="settingsScreen" class="screen">
   <div class="page-header"><div class="page-title">SETTINGS</div></div>
-  <div class="settings-section">
-    <div class="settings-section-title">Exercise Library</div>
-    <div class="settings-row">
-      <div><div class="settings-row-label">Manage Exercises</div><div class="settings-row-sub">Add, edit, or remove exercises</div></div>
-      <button class="btn btn-secondary btn-sm" onclick="showScreen('exercises')">Open →</button>
-    </div>
-  </div>
   <div class="settings-section">
     <div class="settings-section-title">Open Wearables Sync</div>
     <div class="settings-row">
@@ -423,6 +420,39 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-fam
     </div>
   </div>
   <div class="settings-section">
+    <div class="settings-section-title">Physique Goals</div>
+    <div class="settings-row">
+      <div><div class="settings-row-label">Target body fat %</div><div class="settings-row-sub">Navy tape estimate range</div></div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input class="settings-input" type="number" id="s-goal-bf-min" min="0" max="50" step="0.5" style="width:52px">
+        <span style="color:var(--muted);font-size:12px">–</span>
+        <input class="settings-input" type="number" id="s-goal-bf-max" min="0" max="50" step="0.5" style="width:52px">
+        <span style="font-size:12px;color:var(--muted)">%</span>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-row-label">Target weight</div><div class="settings-row-sub">At target body fat</div></div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input class="settings-input" type="number" id="s-goal-weight-min" min="0" step="1" style="width:56px">
+        <span style="color:var(--muted);font-size:12px">–</span>
+        <input class="settings-input" type="number" id="s-goal-weight-max" min="0" step="1" style="width:56px">
+        <span id="s-unit-label-4" style="font-size:12px;color:var(--muted)">lbs</span>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-row-label">Waist ceiling</div><div class="settings-row-sub">Stay at or below</div></div>
+      <div style="display:flex;align-items:center;gap:6px"><input class="settings-input" type="number" id="s-goal-waist-max" min="0" step="0.5" style="width:56px"><span style="font-size:12px;color:var(--muted)">in</span></div>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-row-label">Chest floor</div><div class="settings-row-sub">Grow to at least</div></div>
+      <div style="display:flex;align-items:center;gap:6px"><input class="settings-input" type="number" id="s-goal-chest-min" min="0" step="0.5" style="width:56px"><span style="font-size:12px;color:var(--muted)">in</span></div>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-row-label">Arms floor</div><div class="settings-row-sub">Grow to at least</div></div>
+      <div style="display:flex;align-items:center;gap:6px"><input class="settings-input" type="number" id="s-goal-arm-min" min="0" step="0.5" style="width:56px"><span style="font-size:12px;color:var(--muted)">in</span></div>
+    </div>
+  </div>
+  <div class="settings-section">
     <div class="settings-section-title">Units</div>
     <div class="settings-row">
       <div><div class="settings-row-label">Weight unit</div></div>
@@ -452,8 +482,14 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-fam
   <button onclick="showScreen('routines')" id="nav-routines">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Routines
   </button>
-  <button onclick="showScreen('activity')" id="nav-activity">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Activity
+  <button onclick="showScreen('history')" id="nav-history">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>History
+  </button>
+  <button onclick="showScreen('progress')" id="nav-progress">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress
+  </button>
+  <button onclick="showScreen('exercises')" id="nav-exercises">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5h11M6.5 12h11M6.5 17.5h11M3 6.5h.01M3 12h.01M3 17.5h.01"/></svg>Exercises
   </button>
   <button onclick="showScreen('settings')" id="nav-settings">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings
@@ -463,6 +499,42 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-fam
 
 <!-- PR TOAST -->
 <div class="pr-toast" id="prToast">🏆 <span id="prToastMsg"></span></div>
+
+<!-- BODY METRIC LOG -->
+<div class="modal-overlay" id="bodyMetricModal">
+  <div class="modal">
+    <div class="modal-title" id="bodyMetricModalTitle">LOG METRICS</div>
+    <input type="hidden" id="bm-id">
+    <div class="field">
+      <label>Date</label>
+      <input type="date" id="bm-date">
+    </div>
+    <div class="field">
+      <label>Weight (<span id="bm-unit-label">lbs</span>)</label>
+      <input type="number" id="bm-weight" step="0.1" placeholder="e.g. 235">
+    </div>
+    <div class="field">
+      <label>Body Fat % (Navy tape)</label>
+      <input type="number" id="bm-bodyfat" step="0.1" placeholder="e.g. 19.5">
+    </div>
+    <div class="field">
+      <label>Waist (in)</label>
+      <input type="number" id="bm-waist" step="0.1" placeholder="e.g. 36.5">
+    </div>
+    <div class="field">
+      <label>Chest (in)</label>
+      <input type="number" id="bm-chest" step="0.1" placeholder="e.g. 46">
+    </div>
+    <div class="field">
+      <label>Arms (in)</label>
+      <input type="number" id="bm-arms" step="0.1" placeholder="e.g. 15.5">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('bodyMetricModal')" style="flex:1">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBodyMetric()" style="flex:1">Save</button>
+    </div>
+  </div>
+</div>
 
 <!-- EXERCISE PICKER (workout) -->
 <div class="modal-overlay" id="exercisePickerModal">
@@ -491,7 +563,7 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-fam
     <div class="field"><label>Name</label><input type="text" id="newExName" placeholder="e.g. Bench Press"></div>
     <div class="field">
       <label>Muscle Group</label>
-      <select id="newExGroup"><option>Chest</option><option>Back</option><option>Shoulders</option><option>Traps</option><option>Biceps</option><option>Triceps</option><option>Forearms</option><option>Legs</option><option>Core</option><option>Full Body</option></select>
+      <select id="newExGroup"><option>Chest</option><option>Back</option><option>Shoulders</option><option>Biceps</option><option>Triceps</option><option>Legs</option><option>Core</option><option>Full Body</option></select>
     </div>
     <div class="field">
       <label>Resistance</label>
@@ -525,22 +597,6 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-fam
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('newExerciseModal')" style="flex:1">Cancel</button>
       <button class="btn btn-primary" onclick="saveNewExercise()" style="flex:2">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- LOG BODY METRICS MODAL -->
-<div class="modal-overlay" id="logBodyModal">
-  <div class="modal">
-    <div class="modal-title">LOG BODY METRICS</div>
-    <div class="field"><label>Date</label><input type="date" id="bodyLogDate"></div>
-    <div class="field"><label>Weight (<span id="bodyUnitLabel">lbs</span>)</label><input type="number" id="bodyLogWeight" step=".1" placeholder="e.g. 235"></div>
-    <div class="field"><label>Waist (in)</label><input type="number" id="bodyLogWaist" step=".1" placeholder="optional"></div>
-    <div class="field"><label>Chest (in)</label><input type="number" id="bodyLogChest" step=".1" placeholder="optional"></div>
-    <div class="field"><label>Arms (in)</label><input type="number" id="bodyLogArms" step=".1" placeholder="optional"></div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('logBodyModal')" style="flex:1">Cancel</button>
-      <button class="btn btn-primary" onclick="saveBodyMetric()" style="flex:2">Save</button>
     </div>
   </div>
 </div>
@@ -589,8 +645,8 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-fam
 // ============================================================
 // DATA
 // ============================================================
-const DEFAULT_SETTINGS={incLight:5,incHeavy:10,heavyThreshold:225,timeIncrement:15,maxTimeSecs:300,defaultRepMin:3,defaultRepMax:6,defaultTimeMin:30,defaultTimeMax:60,warmupPct:30,warmupReps:12,unit:'lbs',restSecs:90,restEnabled:true,owUrl:'http://192.168.1.35:8002',owApiKey:'',owSyncEnabled:false};
-let db={exercises:[],workouts:[],routines:[],syncQueue:[]};
+const DEFAULT_SETTINGS={incLight:5,incHeavy:10,heavyThreshold:225,timeIncrement:15,maxTimeSecs:300,defaultRepMin:3,defaultRepMax:6,defaultTimeMin:30,defaultTimeMax:60,warmupPct:30,warmupReps:12,unit:'lbs',restSecs:90,restEnabled:true,owUrl:'http://192.168.1.35:8002',owApiKey:'',owSyncEnabled:false,goalBfMin:12,goalBfMax:14,goalWeightMin:0,goalWeightMax:0,goalWaistMax:0,goalChestMin:0,goalArmMin:0};
+let db={exercises:[],workouts:[],routines:[],syncQueue:[],bodyMetrics:[]};
 function save(){localStorage.setItem('grind_db',JSON.stringify(db));}
 function load(){
   const raw=localStorage.getItem('grind_db');
@@ -601,7 +657,6 @@ function load(){
   if(!db.bodyMetrics)db.bodyMetrics=[];
   if(!db.settings)db.settings={...DEFAULT_SETTINGS};
   else db.settings={...DEFAULT_SETTINGS,...db.settings};
-  ensureCorenswetProgram();
 }
 function cfg(k){return db.settings[k];}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
@@ -620,59 +675,6 @@ function seedExercises(){
     w('Tricep Pushdown','Triceps',10,15),w('Skull Crusher','Triceps',8,12),
     tm('Plank','Core',30,60,true),bw('Ab Wheel','Core',8,15),
   ];
-  save();
-}
-
-// ============================================================
-// CORENSWET BUILD — 4-day physique program (auto-seeded once)
-// ============================================================
-function ensureExercise(name,group,type,a,b,bw=false){
-  let ex=db.exercises.find(e=>e.name.toLowerCase()===name.toLowerCase());
-  if(ex)return ex.id;
-  let obj;
-  if(type==='timed')obj={id:uid(),name,group,timeMin:a,timeMax:b,bodyweight:bw,timed:true};
-  else obj={id:uid(),name,group,repMin:a,repMax:b,bodyweight:bw,timed:false};
-  db.exercises.push(obj);
-  return obj.id;
-}
-function ensureCorenswetProgram(){
-  const ex={};
-  // New exercises matching home equipment (DB/bands/dip bars/forearm trainer)
-  ex.goblet=ensureExercise('Heel-Elevated Goblet Squat','Legs','reps',8,10);
-  ex.lunge=ensureExercise('DB Walking Lunge','Legs','reps',8,12);
-  ex.legcurl=ensureExercise('Band Leg Curl','Legs','reps',12,15);
-  ex.calf=ensureExercise('Standing Calf Raise (DB)','Legs','reps',12,15);
-  ex.knee=ensureExercise('Hanging Knee Raise','Core','reps',10,15,true);
-  ex.dips=ensureExercise('Dips','Chest','reps',8,12,true);
-  ex.shrug=ensureExercise('DB Shrug','Traps','reps',12,15);
-  ex.wrist=ensureExercise('Wrist Roller','Forearms','timed',20,40);
-  ex.splitsquat=ensureExercise('Heel-Elevated Split Squat','Legs','reps',8,12);
-  ex.hipthrust=ensureExercise('Band Hip Thrust','Legs','reps',10,15);
-  ex.pallof=ensureExercise('Pallof Press','Core','reps',10,12);
-  ex.row=ensureExercise('Single-Arm DB Row','Back','reps',8,10);
-  ex.facepull=ensureExercise('Band Face Pull','Shoulders','reps',15,20);
-  ex.reversecurl=ensureExercise('Band Reverse Curl','Forearms','reps',12,15);
-  // Reuse existing library exercises where they already fit
-  ex.incline=ensureExercise('Incline Dumbbell Press','Chest','reps',8,12);
-  ex.ohp=ensureExercise('Overhead Press','Shoulders','reps',6,10);
-  ex.lateral=ensureExercise('Lateral Raise','Shoulders','reps',12,20);
-  ex.rdl=ensureExercise('Romanian Deadlift','Legs','reps',8,12);
-  ex.reardelt=ensureExercise('Rear Delt Fly','Shoulders','reps',12,20);
-  ex.curl=ensureExercise('Dumbbell Curl','Biceps','reps',10,15);
-
-  if(!db.routines.some(r=>r.name==='Corenswet Build')){
-    const mkDay=(name,list)=>({id:uid(),name,exercises:list.map(([exerciseId,sets])=>({id:uid(),exerciseId,sets}))});
-    db.routines.push({
-      id:uid(),
-      name:'Corenswet Build',
-      days:[
-        mkDay('Lower A',[[ex.goblet,4],[ex.lunge,3],[ex.legcurl,3],[ex.calf,3],[ex.knee,3]]),
-        mkDay('Upper A',[[ex.incline,4],[ex.ohp,3],[ex.dips,3],[ex.lateral,1],[ex.shrug,3],[ex.wrist,2]]),
-        mkDay('Lower B',[[ex.rdl,4],[ex.splitsquat,3],[ex.hipthrust,3],[ex.legcurl,3],[ex.pallof,3]]),
-        mkDay('Upper B',[[ex.row,4],[ex.facepull,4],[ex.reardelt,1],[ex.curl,1],[ex.reversecurl,2],[ex.wrist,2]]),
-      ]
-    });
-  }
   save();
 }
 
@@ -1549,198 +1551,204 @@ function populateChartSelect(){
 }
 
 // ============================================================
-// PROGRESS TABS (Exercise / Volume / Body)
-// ============================================================
-let progressTab='history';
-let volumePeriodWeeks=8;
-const MUSCLE_GROUP_COLORS={
-  Chest:'#ff6b6b',Back:'#4dabf7',Legs:'#51cf66',Shoulders:'#f7c948',
-  Biceps:'#cc5de8',Triceps:'#ff922b',Core:'#20c997','Full Body':'#868e96',
-  Traps:'#e64980',Forearms:'#748ffc'
-};
-function colorForGroup(g){return MUSCLE_GROUP_COLORS[g]||'#9c8f85';}
-
-function setProgressTab(tab){
-  progressTab=tab;
-  ['history','exercise','volume','body'].forEach(t=>{
-    document.getElementById(`progTab-${t}`).className=`btn btn-sm ${t===tab?'btn-primary':'btn-ghost'}`;
-    document.getElementById(`progress${t.charAt(0).toUpperCase()+t.slice(1)}Tab`).style.display=t===tab?'block':'none';
-  });
-  renderProgress();
-}
-function renderProgress(){
-  if(progressTab==='history'){renderHistory();}
-  else if(progressTab==='exercise'){populateChartSelect();renderCharts();}
-  else if(progressTab==='volume'){renderVolumeChart();}
-  else if(progressTab==='body'){renderBodyTab();}
-}
-
-function setVolumePeriod(weeks){
-  volumePeriodWeeks=weeks;
-  [4,8,12].forEach(w=>{
-    document.getElementById(`volPeriod-${w}`).className=`btn btn-sm ${w===weeks?'btn-primary':'btn-ghost'}`;
-  });
-  renderVolumeChart();
-}
-
-function renderVolumeChart(){
-  const area=document.getElementById('volumeChartArea');area.innerHTML='';
-  const weeks=volumePeriodWeeks;
-  const now=new Date();
-  // Build week buckets: index 0 = oldest, index weeks-1 = current week (Mon-Sun)
-  const dayMs=86400000;
-  const startOfWeek=d=>{const x=new Date(d);const day=(x.getDay()+6)%7;x.setHours(0,0,0,0);x.setDate(x.getDate()-day);return x.getTime();};
-  const thisWeekStart=startOfWeek(now);
-  const buckets=[];
-  for(let i=weeks-1;i>=0;i--){
-    const start=thisWeekStart-i*7*dayMs;
-    buckets.push({start,end:start+7*dayMs,counts:{}});
-  }
-  const groupsSeen=new Set();
-  db.workouts.forEach(w=>{
-    const b=buckets.find(bk=>w.date>=bk.start&&w.date<bk.end);
-    if(!b)return;
-    w.exercises.forEach(se=>{
-      const ex=db.exercises.find(e=>e.id===se.exerciseId);if(!ex)return;
-      const setCount=se.sets.filter(s=>s.done&&!s.warmup).length;
-      if(!setCount)return;
-      groupsSeen.add(ex.group);
-      b.counts[ex.group]=(b.counts[ex.group]||0)+setCount;
-    });
-  });
-
-  if(!groupsSeen.size){area.innerHTML=`<div class="chart-empty">Log a few workouts to see volume by muscle group.</div>`;return;}
-
-  const groups=[...groupsSeen].sort();
-  const totals=buckets.map(b=>groups.reduce((a,g)=>a+(b.counts[g]||0),0));
-  const maxTotal=Math.max(...totals,1);
-
-  const wrap=document.createElement('div');wrap.className='chart-wrap';
-  wrap.innerHTML=`<div class="chart-title">Sets per Muscle Group</div><div class="chart-sub">Weekly volume, last ${weeks} weeks</div>`;
-
-  const W=300,H=140,pad={t:10,b:24,l:8,r:8};
-  const bw=(W-pad.l-pad.r)/buckets.length;
-  const barW=bw*0.6;
-  const scaleY=v=>(H-pad.b-pad.t)*(v/maxTotal);
-
-  let svg=`<svg class="chart-svg" viewBox="0 0 ${W} ${H}">`;
-  buckets.forEach((b,i)=>{
-    const x=pad.l+i*bw+(bw-barW)/2;
-    let yCursor=H-pad.b;
-    groups.forEach(g=>{
-      const cnt=b.counts[g]||0;if(!cnt)return;
-      const segH=scaleY(cnt);
-      yCursor-=segH;
-      svg+=`<rect x="${x}" y="${yCursor}" width="${barW}" height="${segH}" fill="${colorForGroup(g)}" rx="1.5"/>`;
-    });
-    if(totals[i]>0){
-      svg+=`<text x="${x+barW/2}" y="${yCursor-4}" text-anchor="middle" font-family="DM Mono" font-size="9" fill="#9c8f85">${totals[i]}</text>`;
-    }
-    // week label — show every other if crowded
-    if(buckets.length<=6||i===0||i===buckets.length-1||i%2===0){
-      const lbl=new Date(b.start).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-      svg+=`<text x="${x+barW/2}" y="${H-6}" text-anchor="middle" font-family="DM Mono" font-size="7" fill="#9c8f85">${lbl}</text>`;
-    }
-  });
-  svg+=`</svg>`;
-  wrap.innerHTML+=svg;
-
-  // Legend
-  let legend=`<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">`;
-  groups.forEach(g=>{
-    legend+=`<div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)"><span style="width:9px;height:9px;border-radius:2px;background:${colorForGroup(g)};display:inline-block"></span>${g}</div>`;
-  });
-  legend+=`</div>`;
-  wrap.innerHTML+=legend;
-
-  area.appendChild(wrap);
-}
-
-// ============================================================
 // BODY METRICS
 // ============================================================
-function openLogBodyModal(){
-  document.getElementById('bodyLogDate').value=new Date().toISOString().slice(0,10);
-  document.getElementById('bodyLogWeight').value='';
-  document.getElementById('bodyLogWaist').value='';
-  document.getElementById('bodyLogChest').value='';
-  document.getElementById('bodyLogArms').value='';
-  document.getElementById('bodyUnitLabel').textContent=cfg('unit');
-  openModal('logBodyModal');
+function switchProgressTab(tab){
+  document.getElementById('ptab-lifts').className=`btn btn-sm ${tab==='lifts'?'btn-primary':'btn-ghost'}`;
+  document.getElementById('ptab-body').className=`btn btn-sm ${tab==='body'?'btn-primary':'btn-ghost'}`;
+  document.getElementById('progressLifts').style.display=tab==='lifts'?'block':'none';
+  document.getElementById('progressBody').style.display=tab==='body'?'block':'none';
+  if(tab==='body'){renderGoalSummary();renderBodyChart();renderBodyMetricsList();}
 }
+
+function sortedMetrics(){return [...db.bodyMetrics].sort((a,b)=>a.date-b.date);}
+function latestMetric(){const m=sortedMetrics();return m.length?m[m.length-1]:null;}
+function leanMass(m){
+  if(m==null||m.weight==null||m.bodyFat==null)return null;
+  return m.weight*(1-m.bodyFat/100);
+}
+
+function openBodyMetricModal(id){
+  document.getElementById('bm-id').value=id||'';
+  document.getElementById('bodyMetricModalTitle').textContent=id?'EDIT METRICS':'LOG METRICS';
+  document.getElementById('bm-unit-label').textContent=cfg('unit');
+  if(id){
+    const m=db.bodyMetrics.find(x=>x.id===id);
+    document.getElementById('bm-date').value=new Date(m.date).toISOString().slice(0,10);
+    document.getElementById('bm-weight').value=m.weight??'';
+    document.getElementById('bm-bodyfat').value=m.bodyFat??'';
+    document.getElementById('bm-waist').value=m.waist??'';
+    document.getElementById('bm-chest').value=m.chest??'';
+    document.getElementById('bm-arms').value=m.arms??'';
+  } else {
+    document.getElementById('bm-date').value=new Date().toISOString().slice(0,10);
+    ['bm-weight','bm-bodyfat','bm-waist','bm-chest','bm-arms'].forEach(f=>document.getElementById(f).value='');
+  }
+  openModal('bodyMetricModal');
+}
+
 function saveBodyMetric(){
-  const dateVal=document.getElementById('bodyLogDate').value;
-  const weight=parseFloat(document.getElementById('bodyLogWeight').value);
-  if(!dateVal||isNaN(weight)){alert('Date and weight are required.');return;}
+  const id=document.getElementById('bm-id').value;
+  const dateVal=document.getElementById('bm-date').value;
+  if(!dateVal)return;
+  const num=v=>{const n=parseFloat(v);return isNaN(n)?null:n;};
   const entry={
-    id:uid(),
+    id:id||uid(),
     date:new Date(dateVal+'T12:00:00').getTime(),
-    weight,
-    waist:parseFloat(document.getElementById('bodyLogWaist').value)||null,
-    chest:parseFloat(document.getElementById('bodyLogChest').value)||null,
-    arms:parseFloat(document.getElementById('bodyLogArms').value)||null,
+    weight:num(document.getElementById('bm-weight').value),
+    bodyFat:num(document.getElementById('bm-bodyfat').value),
+    waist:num(document.getElementById('bm-waist').value),
+    chest:num(document.getElementById('bm-chest').value),
+    arms:num(document.getElementById('bm-arms').value)
   };
-  // Replace existing entry for the same date if present
-  db.bodyMetrics=db.bodyMetrics.filter(m=>new Date(m.date).toDateString()!==new Date(entry.date).toDateString());
-  db.bodyMetrics.push(entry);
-  db.bodyMetrics.sort((a,b)=>a.date-b.date);
-  save();
-  closeModal('logBodyModal');
-  renderBodyTab();
+  if(id){
+    const idx=db.bodyMetrics.findIndex(x=>x.id===id);
+    if(idx>-1)db.bodyMetrics[idx]=entry;
+  } else {
+    db.bodyMetrics.push(entry);
+  }
+  save();closeModal('bodyMetricModal');
+  renderGoalSummary();renderBodyChart();renderBodyMetricsList();
 }
+
 function deleteBodyMetric(id){
   if(!confirm('Delete this entry?'))return;
-  db.bodyMetrics=db.bodyMetrics.filter(m=>m.id!==id);
-  save();renderBodyTab();
+  db.bodyMetrics=db.bodyMetrics.filter(x=>x.id!==id);
+  save();renderGoalSummary();renderBodyChart();renderBodyMetricsList();
 }
-function renderBodyTab(){
-  renderBodyChart();
-  const list=document.getElementById('bodyMetricsList');list.innerHTML='';
-  if(!db.bodyMetrics.length){list.innerHTML=`<div class="empty-state"><div class="empty-icon">📏</div>No body metrics logged yet.</div>`;return;}
-  [...db.bodyMetrics].sort((a,b)=>b.date-a.date).forEach(m=>{
-    const row=document.createElement('div');
-    row.className='history-item';
-    row.style.cursor='default';
-    const parts=[`${m.weight} ${cfg('unit')}`];
-    if(m.waist)parts.push(`Waist ${m.waist}"`);
-    if(m.chest)parts.push(`Chest ${m.chest}"`);
-    if(m.arms)parts.push(`Arms ${m.arms}"`);
-    row.innerHTML=`<div class="history-item-header">
-        <div><div class="history-name">${parts[0]}</div><div class="history-date">${formatDate(m.date)}</div></div>
-        <button class="btn btn-ghost btn-sm" onclick="deleteBodyMetric('${m.id}')">Delete</button>
+
+function renderGoalSummary(){
+  const el=document.getElementById('goalSummary');if(!el)return;
+  const m=latestMetric();
+  const s=db.settings;
+  if(!m){el.innerHTML=`<div class="empty-state" style="padding:20px 10px"><div class="empty-icon">📏</div>Log your first entry to start tracking toward your goal.</div>`;return;}
+
+  const rows=[];
+  const pushRow=(label,current,unit,target,mode)=>{
+    if(current==null||!target)return;
+    let pct,statusTxt,ok;
+    if(mode==='band'){ // target is [min,max], want current inside band, closer to band = higher %
+      const[tmin,tmax]=target;
+      if(current>=tmin&&current<=tmax){pct=100;ok=true;}
+      else{
+        const dist=current<tmin?tmin-current:current-tmax;
+        const span=(tmax-tmin)||1;
+        pct=Math.max(0,100-Math.min(100,(dist/span)*100));
+        ok=false;
+      }
+      statusTxt=`${current}${unit} → target ${tmin}–${tmax}${unit}`;
+    } else if(mode==='max'){ // lower is better, target is ceiling
+      ok=current<=target;
+      pct=ok?100:Math.max(0,100-((current-target)/target)*100);
+      statusTxt=`${current}${unit} → target ≤${target}${unit}`;
+    } else { // 'min', higher is better, target is floor
+      ok=current>=target;
+      pct=Math.min(100,(current/target)*100);
+      statusTxt=`${current}${unit} → target ≥${target}${unit}`;
+    }
+    rows.push({label,statusTxt,pct:Math.round(pct),ok});
+  };
+
+  pushRow('Body Fat %',m.bodyFat,'%', (s.goalBfMin&&s.goalBfMax)?[s.goalBfMin,s.goalBfMax]:null,'band');
+  pushRow('Weight',m.weight,cfg('unit'), (s.goalWeightMin&&s.goalWeightMax)?[s.goalWeightMin,s.goalWeightMax]:null,'band');
+  pushRow('Waist',m.waist,'in', s.goalWaistMax||null,'max');
+  pushRow('Chest',m.chest,'in', s.goalChestMin||null,'min');
+  pushRow('Arms',m.arms,'in', s.goalArmMin||null,'min');
+
+  const lean=leanMass(m);
+  let leanHtml='';
+  if(lean!=null)leanHtml=`<div class="stat-card" style="margin-bottom:10px"><div class="stat-label" style="margin-top:0;margin-bottom:4px">Lean Mass (est.)</div><div class="stat-val" style="font-size:26px">${lean.toFixed(1)} ${cfg('unit')}</div></div>`;
+
+  if(!rows.length){
+    el.innerHTML=leanHtml+`<div class="empty-state" style="padding:16px 10px">Set your targets in Settings → Physique Goals to see progress here.</div>`;
+    return;
+  }
+
+  el.innerHTML=leanHtml+rows.map(r=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+        <span style="font-weight:600;font-size:14px">${r.label}${r.ok?' ✅':''}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${r.statusTxt}</span>
       </div>
-      <div class="history-exercises" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${parts.slice(1).join(' · ')}</div>`;
-    list.appendChild(row);
-  });
+      <div style="background:var(--surface2);border-radius:6px;height:8px;overflow:hidden">
+        <div style="background:${r.ok?'var(--green)':'var(--accent)'};height:100%;width:${r.pct}%;transition:width .3s"></div>
+      </div>
+    </div>
+  `).join('');
 }
+
+const BODY_METRIC_META={
+  weight:{label:'Weight',getUnit:()=>cfg('unit'),get:m=>m.weight},
+  bodyFat:{label:'Body Fat %',getUnit:()=>'%',get:m=>m.bodyFat},
+  leanMass:{label:'Lean Mass',getUnit:()=>cfg('unit'),get:m=>leanMass(m)},
+  waist:{label:'Waist',getUnit:()=>'in',get:m=>m.waist},
+  chest:{label:'Chest',getUnit:()=>'in',get:m=>m.chest},
+  arms:{label:'Arms',getUnit:()=>'in',get:m=>m.arms}
+};
+
+function getGoalBandFor(metric){
+  const s=db.settings;
+  if(metric==='bodyFat'&&s.goalBfMin&&s.goalBfMax)return{min:s.goalBfMin,max:s.goalBfMax};
+  if(metric==='weight'&&s.goalWeightMin&&s.goalWeightMax)return{min:s.goalWeightMin,max:s.goalWeightMax};
+  if(metric==='waist'&&s.goalWaistMax)return{max:s.goalWaistMax};
+  if(metric==='chest'&&s.goalChestMin)return{min:s.goalChestMin};
+  if(metric==='arms'&&s.goalArmMin)return{min:s.goalArmMin};
+  return null;
+}
+
 function renderBodyChart(){
-  const area=document.getElementById('bodyChartArea');area.innerHTML='';
-  const points=[...db.bodyMetrics].sort((a,b)=>a.date-b.date).map(m=>({date:m.date,val:m.weight,label:`${m.weight}${cfg('unit')}`}));
-  if(points.length<2){area.innerHTML=`<div class="chart-empty">Log at least 2 entries to see a trend.</div>`;return;}
+  const selEl=document.getElementById('bodyMetricSelect');if(!selEl)return;
+  const metric=selEl.value||'weight';
+  const area=document.getElementById('bodyChartArea');if(!area)return;
+  area.innerHTML='';
+  const meta=BODY_METRIC_META[metric];
+  const points=sortedMetrics().map(m=>({date:m.date,val:meta.get(m)})).filter(p=>p.val!=null);
+
+  if(points.length<2){area.innerHTML=`<div class="chart-empty">Log at least 2 entries to see a chart.</div>`;return;}
 
   const wrap=document.createElement('div');wrap.className='chart-wrap';
-  wrap.innerHTML=`<div class="chart-title">Bodyweight</div><div class="chart-sub">Trend over time</div>`;
+  wrap.innerHTML=`<div class="chart-title">${meta.label}</div><div class="chart-sub">Trend over time</div>`;
 
+  const band=getGoalBandFor(metric);
   const W=300,H=120,pad={t:10,b:30,l:40,r:10};
   const vals=points.map(p=>p.val);
-  const minV=Math.min(...vals),maxV=Math.max(...vals);
-  const vRange=maxV-minV||1;
+  let minV=Math.min(...vals),maxV=Math.max(...vals);
+  if(band){if(band.min!=null)minV=Math.min(minV,band.min);if(band.max!=null)maxV=Math.max(maxV,band.max);}
+  const vRange=(maxV-minV)||1;
+  const padded=vRange*0.1;
+  minV-=padded;maxV+=padded;
+  const vRange2=maxV-minV||1;
   const xStep=(W-pad.l-pad.r)/(points.length-1);
-  const scaleY=v=>pad.t+(H-pad.t-pad.b)*(1-(v-minV)/vRange);
+  const scaleY=v=>pad.t+(H-pad.t-pad.b)*(1-(v-minV)/vRange2);
+
+  let svg=`<svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+    <defs><linearGradient id="cgb" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff6b6b" stop-opacity=".25"/><stop offset="100%" stop-color="#ff6b6b" stop-opacity="0"/></linearGradient></defs>`;
+
+  // Goal band/line
+  if(band){
+    if(band.min!=null&&band.max!=null){
+      const y1=scaleY(band.max),y2=scaleY(band.min);
+      svg+=`<rect x="${pad.l}" y="${y1}" width="${W-pad.l-pad.r}" height="${y2-y1}" fill="#22c55e" fill-opacity=".08"/>`;
+      svg+=`<line x1="${pad.l}" y1="${y1}" x2="${W-pad.r}" y2="${y1}" stroke="#22c55e" stroke-width="1" stroke-dasharray="3,3"/>`;
+      svg+=`<line x1="${pad.l}" y1="${y2}" x2="${W-pad.r}" y2="${y2}" stroke="#22c55e" stroke-width="1" stroke-dasharray="3,3"/>`;
+    } else {
+      const target=band.min!=null?band.min:band.max;
+      const y=scaleY(target);
+      svg+=`<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+      svg+=`<text x="${W-pad.r}" y="${y-4}" text-anchor="end" font-family="DM Mono" font-size="8" fill="#22c55e">target ${target}</text>`;
+    }
+  }
 
   const pts=points.map((p,i)=>`${pad.l+i*xStep},${scaleY(p.val)}`).join(' ');
   const fillPts=`${pad.l},${H-pad.b} ${pts} ${pad.l+(points.length-1)*xStep},${H-pad.b}`;
-
-  let svg=`<svg class="chart-svg" viewBox="0 0 ${W} ${H}">
-    <defs><linearGradient id="cgBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff6b6b" stop-opacity=".25"/><stop offset="100%" stop-color="#ff6b6b" stop-opacity="0"/></linearGradient></defs>
-    <polygon points="${fillPts}" fill="url(#cgBody)"/>
+  svg+=`<polygon points="${fillPts}" fill="url(#cgb)"/>
     <polyline points="${pts}" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linejoin="round"/>`;
 
   points.forEach((p,i)=>{
     const cx=pad.l+i*xStep,cy=scaleY(p.val);
     svg+=`<circle cx="${cx}" cy="${cy}" r="3" fill="#ff6b6b"/>`;
     if(i===points.length-1||i===0||points.length<=6){
-      svg+=`<text x="${cx}" y="${cy-6}" text-anchor="middle" font-family="DM Mono" font-size="9" fill="#9c8f85">${p.label}</text>`;
+      svg+=`<text x="${cx}" y="${cy-6}" text-anchor="middle" font-family="DM Mono" font-size="9" fill="#9c8f85">${p.val.toFixed(1)}</text>`;
     }
   });
 
@@ -1751,6 +1759,29 @@ function renderBodyChart(){
   svg+=`</svg>`;
 
   wrap.innerHTML+=svg;area.appendChild(wrap);
+}
+
+function renderBodyMetricsList(){
+  const list=document.getElementById('bodyMetricsList');if(!list)return;
+  const entries=[...db.bodyMetrics].sort((a,b)=>b.date-a.date);
+  if(!entries.length){list.innerHTML=`<div class="empty-state" style="padding:20px 10px"><div class="empty-icon">📋</div>No entries logged yet.</div>`;return;}
+  list.innerHTML=entries.map(m=>{
+    const parts=[];
+    if(m.weight!=null)parts.push(`${m.weight}${cfg('unit')}`);
+    if(m.bodyFat!=null)parts.push(`${m.bodyFat}% BF`);
+    if(m.waist!=null)parts.push(`W ${m.waist}"`);
+    if(m.chest!=null)parts.push(`C ${m.chest}"`);
+    if(m.arms!=null)parts.push(`A ${m.arms}"`);
+    const lean=leanMass(m);
+    if(lean!=null)parts.push(`Lean ${lean.toFixed(1)}${cfg('unit')}`);
+    return `<div class="history-item" onclick="openBodyMetricModal('${m.id}')">
+      <div class="history-item-header">
+        <div class="history-name">${formatDate(m.date)}</div>
+        <div class="recent-date" onclick="event.stopPropagation();deleteBodyMetric('${m.id}')" style="color:var(--danger);cursor:pointer">✕</div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${parts.join(' · ')||'—'}</div>
+    </div>`;
+  }).join('');
 }
 
 // ============================================================
@@ -1897,6 +1928,14 @@ function renderSettings(){
   document.getElementById('newExRepMax').value=s.defaultRepMax;
   document.getElementById('newExTimeMin').value=s.defaultTimeMin;
   document.getElementById('newExTimeMax').value=s.defaultTimeMax;
+  document.getElementById('s-goal-bf-min').value=s.goalBfMin;
+  document.getElementById('s-goal-bf-max').value=s.goalBfMax;
+  document.getElementById('s-goal-weight-min').value=s.goalWeightMin;
+  document.getElementById('s-goal-weight-max').value=s.goalWeightMax;
+  document.getElementById('s-goal-waist-max').value=s.goalWaistMax;
+  document.getElementById('s-goal-chest-min').value=s.goalChestMin;
+  document.getElementById('s-goal-arm-min').value=s.goalArmMin;
+  const s4=document.getElementById('s-unit-label-4');if(s4)s4.textContent=s.unit;
 }
 function saveSettings(){
   const s=db.settings;
@@ -1916,7 +1955,15 @@ function saveSettings(){
   s.restSecs=parseInt(document.getElementById('s-rest-secs').value)||DEFAULT_SETTINGS.restSecs;
   if(s.defaultRepMax<s.defaultRepMin)s.defaultRepMax=s.defaultRepMin;
   if(s.defaultTimeMax<s.defaultTimeMin)s.defaultTimeMax=s.defaultTimeMin;
+  s.goalBfMin=parseFloat(document.getElementById('s-goal-bf-min').value)||0;
+  s.goalBfMax=parseFloat(document.getElementById('s-goal-bf-max').value)||0;
+  s.goalWeightMin=parseFloat(document.getElementById('s-goal-weight-min').value)||0;
+  s.goalWeightMax=parseFloat(document.getElementById('s-goal-weight-max').value)||0;
+  s.goalWaistMax=parseFloat(document.getElementById('s-goal-waist-max').value)||0;
+  s.goalChestMin=parseFloat(document.getElementById('s-goal-chest-min').value)||0;
+  s.goalArmMin=parseFloat(document.getElementById('s-goal-arm-min').value)||0;
   save();renderSettings();
+  renderGoalSummary();
   const btn=document.querySelector('#settingsScreen .btn-primary');
   const orig=btn.textContent;btn.textContent='✓ Saved';setTimeout(()=>btn.textContent=orig,1500);
 }
@@ -1924,7 +1971,7 @@ function setWeightUnit(unit){
   db.settings.unit=unit;
   document.getElementById('unit-kg').className=`btn btn-sm ${unit==='kg'?'btn-primary':'btn-ghost'}`;
   document.getElementById('unit-lbs').className=`btn btn-sm ${unit==='lbs'?'btn-primary':'btn-ghost'}`;
-  ['s-unit-label-1','s-unit-label-2','s-unit-label-3'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=unit;});
+  ['s-unit-label-1','s-unit-label-2','s-unit-label-3','s-unit-label-4'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=unit;});
 }
 function setOWSyncEnabled(val){
   db.settings.owSyncEnabled=val;
@@ -1960,7 +2007,7 @@ function resetAllData(){
   if(!confirm('Delete ALL workouts, routines, and exercises? This cannot be undone.'))return;
   if(!confirm('Are you sure? Everything will be wiped.'))return;
   const settings={...db.settings};
-  db={exercises:[],workouts:[],routines:[],settings};
+  db={exercises:[],workouts:[],routines:[],settings,bodyMetrics:[]};
   seedExercises();save();renderHome();showScreen('home');
 }
 
@@ -1973,8 +2020,9 @@ function showScreen(name){
   const map={
     home:['homeScreen','nav-home',renderHome],
     routines:['routinesScreen','nav-routines',renderRoutines],
-    activity:['progressScreen','nav-activity',renderProgress],
-    exercises:['exercisesScreen','nav-settings',renderExerciseLibrary],
+    history:['historyScreen','nav-history',renderHistory],
+    progress:['progressScreen','nav-progress',()=>{populateChartSelect();renderCharts();renderGoalSummary();renderBodyChart();renderBodyMetricsList();}],
+    exercises:['exercisesScreen','nav-exercises',renderExerciseLibrary],
     settings:['settingsScreen','nav-settings',renderSettings],
     active:['activeWorkout',null,null]
   };
