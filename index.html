@@ -563,7 +563,7 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-fam
     <div class="field"><label>Name</label><input type="text" id="newExName" placeholder="e.g. Bench Press"></div>
     <div class="field">
       <label>Muscle Group</label>
-      <select id="newExGroup"><option>Chest</option><option>Back</option><option>Shoulders</option><option>Biceps</option><option>Triceps</option><option>Legs</option><option>Core</option><option>Full Body</option></select>
+      <select id="newExGroup"><option>Chest</option><option>Back</option><option>Shoulders</option><option>Traps</option><option>Biceps</option><option>Triceps</option><option>Forearms</option><option>Legs</option><option>Core</option><option>Full Body</option></select>
     </div>
     <div class="field">
       <label>Resistance</label>
@@ -657,6 +657,7 @@ function load(){
   if(!db.bodyMetrics)db.bodyMetrics=[];
   if(!db.settings)db.settings={...DEFAULT_SETTINGS};
   else db.settings={...DEFAULT_SETTINGS,...db.settings};
+  ensureCorenswetProgram();
 }
 function cfg(k){return db.settings[k];}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
@@ -675,6 +676,59 @@ function seedExercises(){
     w('Tricep Pushdown','Triceps',10,15),w('Skull Crusher','Triceps',8,12),
     tm('Plank','Core',30,60,true),bw('Ab Wheel','Core',8,15),
   ];
+  save();
+}
+
+// ============================================================
+// CORENSWET BUILD — 4-day physique program (auto-seeded once)
+// ============================================================
+function ensureExercise(name,group,type,a,b,bw=false){
+  let ex=db.exercises.find(e=>e.name.toLowerCase()===name.toLowerCase());
+  if(ex)return ex.id;
+  let obj;
+  if(type==='timed')obj={id:uid(),name,group,timeMin:a,timeMax:b,bodyweight:bw,timed:true};
+  else obj={id:uid(),name,group,repMin:a,repMax:b,bodyweight:bw,timed:false};
+  db.exercises.push(obj);
+  return obj.id;
+}
+function ensureCorenswetProgram(){
+  const ex={};
+  // New exercises matching home equipment (DB/bands/dip bars/forearm trainer)
+  ex.goblet=ensureExercise('Heel-Elevated Goblet Squat','Legs','reps',8,10);
+  ex.lunge=ensureExercise('DB Walking Lunge','Legs','reps',8,12);
+  ex.legcurl=ensureExercise('Band Leg Curl','Legs','reps',12,15);
+  ex.calf=ensureExercise('Standing Calf Raise (DB)','Legs','reps',12,15);
+  ex.knee=ensureExercise('Hanging Knee Raise','Core','reps',10,15,true);
+  ex.dips=ensureExercise('Dips','Chest','reps',8,12,true);
+  ex.shrug=ensureExercise('DB Shrug','Traps','reps',12,15);
+  ex.wrist=ensureExercise('Wrist Roller','Forearms','timed',20,40);
+  ex.splitsquat=ensureExercise('Heel-Elevated Split Squat','Legs','reps',8,12);
+  ex.hipthrust=ensureExercise('Band Hip Thrust','Legs','reps',10,15);
+  ex.pallof=ensureExercise('Pallof Press','Core','reps',10,12);
+  ex.row=ensureExercise('Single-Arm DB Row','Back','reps',8,10);
+  ex.facepull=ensureExercise('Band Face Pull','Shoulders','reps',15,20);
+  ex.reversecurl=ensureExercise('Band Reverse Curl','Forearms','reps',12,15);
+  // Reuse existing library exercises where they already fit
+  ex.incline=ensureExercise('Incline Dumbbell Press','Chest','reps',8,12);
+  ex.ohp=ensureExercise('Overhead Press','Shoulders','reps',6,10);
+  ex.lateral=ensureExercise('Lateral Raise','Shoulders','reps',12,20);
+  ex.rdl=ensureExercise('Romanian Deadlift','Legs','reps',8,12);
+  ex.reardelt=ensureExercise('Rear Delt Fly','Shoulders','reps',12,20);
+  ex.curl=ensureExercise('Dumbbell Curl','Biceps','reps',10,15);
+
+  if(!db.routines.some(r=>r.name==='Corenswet Build')){
+    const mkDay=(name,list)=>({id:uid(),name,exercises:list.map(([exerciseId,sets])=>({id:uid(),exerciseId,sets}))});
+    db.routines.push({
+      id:uid(),
+      name:'Corenswet Build',
+      days:[
+        mkDay('Lower A',[[ex.goblet,4],[ex.lunge,3],[ex.legcurl,3],[ex.calf,3],[ex.knee,3]]),
+        mkDay('Upper A',[[ex.incline,4],[ex.ohp,3],[ex.dips,3],[ex.lateral,1],[ex.shrug,3],[ex.wrist,2]]),
+        mkDay('Lower B',[[ex.rdl,4],[ex.splitsquat,3],[ex.hipthrust,3],[ex.legcurl,3],[ex.pallof,3]]),
+        mkDay('Upper B',[[ex.row,4],[ex.facepull,4],[ex.reardelt,1],[ex.curl,1],[ex.reversecurl,2],[ex.wrist,2]]),
+      ]
+    });
+  }
   save();
 }
 
